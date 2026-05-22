@@ -1,0 +1,67 @@
+=========================================================
+          LICENCIA DE USO PROPIETARIO Y ACUERDO DE CONFIDENCIALIDAD
+                     V - v5.8.0
+=========================================================
+
+TITULAR DEL COPYRIGHT: Deylin Eliac (El Autor)
+AÑO: 2026
+ESTADO: Propiedad Privada / No Redistribuible
+
+---------------------------------------------------------
+1. CONCESIÓN DE LICENCIA
+---------------------------------------------------------
+Se otorga al usuario el derecho de utilizar este software de manera 
+exclusivamente PERSONAL y PRIVADA. Esta licencia permite la ejecución del 
+sistema en el entorno del usuario (Termux/VPS/PC) para fines de 
+entretenimiento y automatización individual. Queda prohibido cualquier 
+otro uso no especificado en este documento.
+
+---------------------------------------------------------
+2. PROTECCIÓN DE ACTIVOS Y APIs (NDA)
+---------------------------------------------------------
+Este software integra llaves de acceso (APIs) y recursos digitales que 
+pertenecen al Autor y a terceros asociados. 
+- Queda ESTRICTAMENTE PROHIBIDO filtrar, compartir, sublicenciar o 
+  distribuir las llaves de acceso integradas en el código o descargadas 
+  por el sistema.
+- El usuario reconoce que estas llaves son propiedad privada y su 
+  divulgación constituye una infracción legal contra la privacidad y 
+  los derechos de propiedad industrial.
+
+----------------------------------------------------------
+3. RESTRICCIONES DE PROPAGACIÓN Y COPIA
+----------------------------------------------------------
+El usuario NO tiene permiso para:
+- Vender, alquilar o comercializar este software o cualquiera de sus 
+  funciones.
+- Clonar el repositorio con el fin de crear distribuciones masivas 
+  ajenas al control del Autor original.
+- Compartir el código fuente modificado que exponga los métodos de 
+  autenticación (Handshake) del sistema.
+
+----------------------------------------------------------
+4. INTEGRIDAD DE AUTORÍA
+----------------------------------------------------------
+Los créditos de autoría, nombres de desarrollador y firmas digitales 
+presentes en los archivos .js, .sh, .html y .json son INAMOVIBLES. La 
+alteración de los mismos resultará en la revocación inmediata de la 
+licencia y el bloqueo técnico del acceso a los recursos del sistema.
+
+----------------------------------------------------------
+5. RESPONSABILIDAD LEGAL Y MULTAS
+----------------------------------------------------------
+- ELIMINACIÓN DE RESPONSABILIDAD: El Autor no se hace responsable por el 
+  bloqueo de cuentas de WhatsApp ni por el mal uso que el usuario final 
+  pueda dar a la herramienta.
+- SANCIONES: Cualquier violación detectada a los términos de esta 
+  licencia, especialmente en lo relativo a la filtración de APIs, será 
+  motivo de proceso legal por daños y perjuicios, amparado bajo las 
+  leyes de propiedad intelectual vigentes. El infractor podrá ser 
+  objeto de MULTAS según la gravedad de la filtración.
+
+----------------------------------------------------------
+AL UTILIZAR, CLONAR O DESPLEGAR ESTE SOFTWARE, USTED ACEPTA QUE HA LEÍDO 
+ESTA LICENCIA Y SE COMPROMETE A CUMPLIR TODOS SUS TÉRMINOS.
+----------------------------------------------------------
+© 2026 DEYLIN AUTOMATION SYSTEMS. TODOS LOS DERECHOS RESERVADOS.
+==========================================================
