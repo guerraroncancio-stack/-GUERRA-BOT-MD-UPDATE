@@ -1,18 +1,15 @@
 import { watchFile, unwatchFile } from 'fs';
+import fs from 'fs';
 import chalk from 'chalk';
 import { fileURLToPath } from 'url';
-import fs from 'fs';
-import * as cheerio from 'cheerio';
-import fetch from 'node-fetch';
 import axios from 'axios';
 import moment from 'moment-timezone';
-import path from 'path';
 import { jidNormalizedUser } from '@whiskeysockets/baileys';
 
 /* =========================
    BRANDING CENTRALIZADO
 ========================= */
-global.BOT_CONFIG = {
+global.BOT_CONFIG = Object.freeze({
   primaryName: '𝐆𝐔𝐄𝐑𝐑𝐀 𝐁𝐎𝐓 ♛',
   aliases: [
     '𝒈𝒖𝒆𝒓𝒓𝒂 𝒃𝒐𝒕 ✰',
@@ -20,16 +17,20 @@ global.BOT_CONFIG = {
     '⌬ 🄶🅄🄴🅁🅁🄰 🄱🄾🅃 ⌬'
   ],
   developer: 'Kevin Santiago Roncancio Guerra'
-};
+});
 
 /* =========================
-   OWNER CONFIG
+   OWNER CONFIG (FIXED)
 ========================= */
-global.owner = [['573102286030'], ['19025051093'], ['']];
+global.owner = [
+  ['573102286030'],
+  ['19025051093']
+];
+
 global.dev1 = '573102286030';
 
 /* =========================
-   BOT MEDIA
+   BOT MEDIA (UNCHANGED)
 ========================= */
 global.botImages = [
   'https://cdn.dix.lat/me/92dbd94f-eb3d-40d8-ac61-fd42f95c73ff.jpg',
@@ -48,84 +49,107 @@ global.botImages2 = [
 ];
 
 /* =========================
-   CHANNELS / SOCIAL
+   CHANNELS
 ========================= */
 global.my = {
   canal1: '120363427020147321@newsletter',
   canal2: '120363427020147321@newsletter'
 };
 
-/* =========================
-   UTILS CENTRALIZADOS
-========================= */
-const conf = {
-  utils: { cheerio, fs, fetch, axios, moment },
-  api: { url: 'https://api.dix.lat' },
-  sessions: { main: 'sessions', sub: 'sessions_sub_assistant' },
-  social: { channel: '120363427020147321@newsletter' }
-};
-
-Object.assign(global, conf.utils);
-
-global.url_api = conf.api.url;
-global.sessions = conf.sessions.main;
-global.jadi = conf.sessions.sub;
-global.ch = conf.social.channel;
-
-global.rmr = String.fromCharCode(8206).repeat(850);
-global.key = "anty3vbmbg5gf";
+global.ch = global.my.canal1;
 
 /* =========================
-   VERSION
+   GLOBAL UTILS SAFE
 ========================= */
-global.v = JSON.parse(fs.readFileSync('./package.json', 'utf-8')).version;
+global.bufferCache = global.bufferCache || new Map();
 
-/* =========================
-   BOT NAME FUNCTION (MEJORADA)
-========================= */
-global.name = (c) => {
-  const connection = c || global.conn;
-  if (!connection?.user) return global.BOT_CONFIG.primaryName;
+/* FIX: safe getBuffer */
+global.getBuffer = async (url) => {
+  if (!url) return null;
 
-  const id = jidNormalizedUser(connection.user.id);
+  if (global.bufferCache.has(url)) return global.bufferCache.get(url);
 
-  if (connection.settings?.botName) {
-    return connection.settings.botName;
+  try {
+    const res = await axios.get(url, {
+      responseType: 'arraybuffer',
+      headers: {
+        'User-Agent': 'Mozilla/5.0'
+      }
+    });
+
+    const data = res.data;
+    global.bufferCache.set(url, data);
+
+    if (global.bufferCache.size > 25) {
+      global.bufferCache.delete(global.bufferCache.keys().next().value);
+    }
+
+    return data;
+  } catch {
+    return null;
   }
-
-  if (global.subbotConfig?.[id]?.botName) {
-    return global.subbotConfig[id].botName;
-  }
-
-  const list = [global.BOT_CONFIG.primaryName, ...global.BOT_CONFIG.aliases];
-  return list[Math.floor(Math.random() * list.length)];
 };
 
 /* =========================
-   BOT IMAGE FUNCTION
+   VERSION SAFE
 ========================= */
-global.img = (c) => {
-  const connection = c || global.conn;
-  const id = connection?.user ? jidNormalizedUser(connection.user.id) : null;
+try {
+  global.v = JSON.parse(fs.readFileSync('./package.json', 'utf-8')).version;
+} catch {
+  global.v = '1.0.0';
+}
 
-  if (connection?.settings?.botImage) return connection.settings.botImage;
-  if (id && global.subbotConfig?.[id]?.botImage) return global.subbotConfig[id].botImage;
+/* =========================
+   BOT NAME (FIXED & SAFE)
+========================= */
+global.name = (conn) => {
+  try {
+    const c = conn || global.conn;
+    if (!c?.user) return global.BOT_CONFIG.primaryName;
 
-  return global.botImages[Math.floor(Math.random() * global.botImages.length)];
-};
+    const id = jidNormalizedUser(c.user.id);
 
-global.img2 = (c) => {
-  const connection = c || global.conn;
-  const id = connection?.user ? jidNormalizedUser(connection.user.id) : null;
+    if (c.settings?.botName) return c.settings.botName;
+    if (global.subbotConfig?.[id]?.botName) return global.subbotConfig[id].botName;
 
-  if (connection?.settings?.botImage) return connection.settings.botImage;
-  if (id && global.subbotConfig?.[id]?.botImage) return global.subbotConfig[id].botImage;
-
-  return global.botImages2[Math.floor(Math.random() * global.botImages2.length)];
+    const list = [global.BOT_CONFIG.primaryName, ...global.BOT_CONFIG.aliases];
+    return list[Math.floor(Math.random() * list.length)];
+  } catch {
+    return global.BOT_CONFIG.primaryName;
+  }
 };
 
 /* =========================
-   CHANNEL UI META
+   IMAGE SELECTOR (SAFE)
+========================= */
+global.img = (conn) => {
+  try {
+    const c = conn || global.conn;
+    const id = c?.user ? jidNormalizedUser(c.user.id) : null;
+
+    if (c?.settings?.botImage) return c.settings.botImage;
+    if (id && global.subbotConfig?.[id]?.botImage) return global.subbotConfig[id].botImage;
+
+    return global.botImages[Math.floor(Math.random() * global.botImages.length)];
+  } catch {
+    return global.botImages[0];
+  }
+};
+
+global.img2 = (conn) => {
+  try {
+    const c = conn || global.conn;
+
+    if (c?.settings?.botImage) return c.settings.botImage;
+
+    return global.botImages2[Math.floor(Math.random() * global.botImages2.length)];
+  } catch {
+    return global.botImages2[0];
+  }
+};
+
+/* =========================
+   CHANNEL META (BAILEYS SAFE)
 ========================= */
 global.channelInfo = {
   forwardingScore: 1,
@@ -137,79 +161,33 @@ global.channelInfo = {
 };
 
 /* =========================
-   BUFFER CACHE OPTIMIZADO
+   TIME SYSTEM FIXED
 ========================= */
-global.bufferCache = global.bufferCache || new Map();
+const now = moment().tz('America/Bogota');
 
-global.getBuffer = async (url, options = {}) => {
-  if (global.bufferCache.has(url)) return global.bufferCache.get(url);
+global.fecha = now.format('DD/MM/YYYY');
+global.tiempo = now.format('hh:mm A');
 
-  if (global.bufferCache.size > 20) {
-    const firstKey = global.bufferCache.keys().next().value;
-    global.bufferCache.delete(firstKey);
-  }
-
-  try {
-    const res = await axios({
-      method: "get",
-      url,
-      headers: {
-        'DNT': 1,
-        'User-Agent':
-          'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36'
-      },
-      ...options,
-      responseType: 'arraybuffer'
-    });
-
-    if (res.status === 200) {
-      global.bufferCache.set(url, res.data);
-      return res.data;
-    }
-
-    return null;
-  } catch {
-    return null;
-  }
-};
-
-/* =========================
-   TIME / DATE
-========================= */
-const d = new Date(Date.now() + 3600000);
-
-global.fecha = d.toLocaleDateString('es', {
-  day: 'numeric',
-  month: 'numeric',
-  year: 'numeric'
-});
-
-global.tiempo = d.toLocaleString('en-US', {
-  hour: 'numeric',
-  minute: 'numeric',
-  hour12: true
-});
-
-const hour = new Intl.DateTimeFormat('es-CO', {
-  hour: '2-digit',
-  hour12: false,
-  timeZone: 'America/Bogota'
-}).format(new Date());
+const hour = parseInt(now.format('HH'));
 
 global.saludo =
-  hour >= 6 && hour < 12
-    ? 'Lɪɴᴅᴀ Mᴀɴ̃ᴀɴᴀ 🌅'
-    : hour >= 12 && hour < 19
-    ? 'Lɪɴᴅᴀ Tᴀʀᴅᴇ 🌆'
-    : 'Lɪɴᴅᴀ Nᴏᴄʜᴇ 🌃';
+  hour < 12 ? 'Lɪɴᴅᴀ Mᴀɴ̃ᴀɴᴀ 🌅'
+  : hour < 19 ? 'Lɪɴᴅᴀ Tᴀʀᴅᴇ 🌆'
+  : 'Lɪɴᴅᴀ Nᴏᴄʜᴇ 🌃';
 
 /* =========================
-   AUTO RELOAD CONFIG
+   CONSTANTS
+========================= */
+global.rmr = String.fromCharCode(8206).repeat(850);
+global.key = 'anty3vbmbg5gf';
+
+/* =========================
+   AUTO RELOAD SAFE
 ========================= */
 const file = fileURLToPath(import.meta.url);
 
 watchFile(file, () => {
   unwatchFile(file);
-  console.log(chalk.redBright("Update 'config.js'"));
+  console.log(chalk.yellowBright("⚡ config.js actualizado"));
   import(`${file}?update=${Date.now()}`);
 });
